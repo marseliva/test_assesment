@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgresDB
+    environment:
+      POSTGRES_DB: appointmentDb
+      POSTGRES_USER: appointment_user
+      POSTGRES_PASSWORD: appointment_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  assignment-app:
+    build: .
+    container_name: app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/appointmentDb
+      SPRING_DATASOURCE_USERNAME: appointment_user
+      SPRING_DATASOURCE_PASSWORD: appointment_password
+      SPRING_PROFILES_ACTIVE: local
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
